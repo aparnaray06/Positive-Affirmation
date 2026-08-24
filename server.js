@@ -17,13 +17,13 @@ app.get("/joke", async (req, res) => {
             {
                 method: "POST",
                 headers: {
-                    "Content-Type":"application/json",
-                    "x-goog-api-key":process.env.GEMINI_API_KEY
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": process.env.GEMINI_API_KEY
                 },
                 body: JSON.stringify({
                     contents: [
                         {
-                            parts:[
+                            parts: [
                                 {
                                     text: "Give me one short funny joke."
                                 }
@@ -34,12 +34,24 @@ app.get("/joke", async (req, res) => {
             }
         );
         const data = await response.json();
-        const joke = data.candidates[0].content.parts[0].text;
+        if (!response.ok) {
+            return res.status(response.status).json({
+                error: data.error?.message || "Gemini API error"
+            });
+        }
+        const joke = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!joke) {
+            return res.status(500).json({
+                error: "No joke received from Gemini"
+            });
+        }
+
 
         res.json({
             joke: joke
         });
-    }catch(error){
+    } catch (error) {
         console.log("Gemini Error", error);
 
         res.status(500).json({
@@ -54,13 +66,13 @@ app.get("/motivation", async (req, res) => {
             {
                 method: "POST",
                 headers: {
-                    "Content-Type":"application/json",
-                    "x-goog-api-key":process.env.GEMINI_API_KEY
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": process.env.GEMINI_API_KEY
                 },
                 body: JSON.stringify({
                     contents: [
                         {
-                            parts:[
+                            parts: [
                                 {
                                     text: "Give me one short motivational quote."
                                 }
@@ -76,7 +88,7 @@ app.get("/motivation", async (req, res) => {
         res.json({
             motivation: motivation
         });
-    }catch(error){
+    } catch (error) {
         console.log("Gemini Error", error);
 
         res.status(500).json({
@@ -91,13 +103,13 @@ app.get("/tip-of-the-day", async (req, res) => {
             {
                 method: "POST",
                 headers: {
-                    "Content-Type":"application/json",
-                    "x-goog-api-key":process.env.GEMINI_API_KEY
+                    "Content-Type": "application/json",
+                    "x-goog-api-key": process.env.GEMINI_API_KEY
                 },
                 body: JSON.stringify({
                     contents: [
                         {
-                            parts:[
+                            parts: [
                                 {
                                     text: "Give me one useful tip of the day."
                                 }
@@ -113,7 +125,7 @@ app.get("/tip-of-the-day", async (req, res) => {
         res.json({
             tip: tip
         });
-    }catch(error){
+    } catch (error) {
         console.log("Gemini Error", error);
 
         res.status(500).json({
@@ -122,6 +134,6 @@ app.get("/tip-of-the-day", async (req, res) => {
     }
 })
 
-app.listen(8000,()=>{
+app.listen(8000, () => {
     console.log("Server is running at PORT 8000");
 })
