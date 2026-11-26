@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
+app.use(express.static("Public"));
 
 const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 
